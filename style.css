@@ -1,12 +1,22 @@
-body {background-color: blue;}
+body {background-color: maroon;}
 
 h1 {
     display: block;
     font-size: 2em;
-    margin-top: 0.67em;
-    margin-bottom: 0.67em;
+    text-align: center;
+    font-family:sans-serif;
+    margin-top: 2em;
+    margin-bottom: 2em;
     margin-left: 0;
     margin-right: 0;
     font-weight: bold;
     color: #FFFFFF
 }
+
+
+.link {
+text-align: center;
+}
+a.one:link {color:white;}
+a.one:visited {color:grey;}
+a.one:hover {color:black;}
