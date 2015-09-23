@@ -1,0 +1,30 @@
+---
+
+---
+$primary: #cc0000;
+$size: 20px;
+
+@mixin border($radius: 5px) {
+-webkit-border-radius: $radius;
+-moz-border-radius: $radius;
+-ms-border-radius: $radius;
+border-radius: $radius;
+
+
+}
+
+p#redParagraph {
+  @include border(10px);
+  background-color: blue;
+  color: $primary;
+  font-size: $size + 12;
+  padding: 50px;
+
+
+
+  a{
+  color: $primary;
+  font-weight: bold;
+
+  }
+}
