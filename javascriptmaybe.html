@@ -1,0 +1,65 @@
+---
+layout: default
+title: java script maybe
+---
+
+<svg width="720" height="120">
+
+</svg>
+
+<button id="start">Click</button>
+
+
+<script>
+
+var dataArray = [
+	{"x": 40, "y": 50, "r": 20, "color": "red"},
+	{"x": 90, "y": 50, "r": 20, "color": "red"},
+	{"x": 140, "y": 50, "r": 20, "color": "red"},
+	{"x": 190, "y": 50, "r": 20, "color": "red"},
+	{"x": 240, "y": 50, "r": 20, "color": "red"},
+]
+
+	dataArray2 = [
+	  {"x": 300, "y": 50, "r": 20, "color": "blue"},
+	  {"x": 358, "y": 50, "r": 20, "color": "blue"},
+		{"x": 416, "y": 50, "r": 20, "color": "blue"},
+		{"x": 475, "y": 50, "r": 20, "color": "blue"},
+		{"x": 240, "y": 50, "r": 20, "color": "blue"},
+	];
+
+
+
+	function draw(data) {
+	  var circle = d3.select("svg").selectAll("circle")
+	    .data(data);
+
+
+			circle.enter().append("circle")
+		      .attr("cy", 50)
+		      .style("fill", function(d){
+		        return d.color;
+		      })
+		      .attr("r", 0);
+
+
+
+	circle.transition().duration(1000)
+		.attr("cx", function(d){
+			return d.x;
+		})
+		.attr("r", function(d){
+			return d.r;
+		})
+		.style("fill", function(d){
+			return d.color;
+		});
+
+};
+
+draw(dataArray);
+d3.select("#start").on("click", function(){
+  draw(dataArray2);
+});
+
+</script>
