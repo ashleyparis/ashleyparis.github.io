@@ -43,9 +43,11 @@ request.open('GET', 'http://private-anon-87a587ad8-olympicsapi.apiary-mock.com/s
 
 request.onreadystatechange = function () {
   if (this.readyState === 4) {
-    console.log('Status:', this.status);
-    console.log('Headers:', this.getAllResponseHeaders());
-    console.log('Body:', this.responseText);
+    console.log(this.responseText.constructor)
+    var data = this.responseText.replace(/\'/g, "\"");
+    console.log(data)
+    data = JSON.parse(data);
+    console.log(data);
   }
 };
 
