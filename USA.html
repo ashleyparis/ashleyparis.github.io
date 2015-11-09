@@ -1,0 +1,123 @@
+---
+layout: default
+title: November
+---
+<style>
+
+svg {
+background-color: #F7F3E2;
+width:100%;
+
+
+}
+
+  #controls {
+    position:absolute;
+    top: 0;
+    margin-left: 50%;
+
+  }
+
+
+  </style>
+
+
+<svg width=500 height=500>
+  <div id="controls">
+    <select id="year_dropdown"></select>
+  </div>
+
+
+</svg>
+
+
+<script>
+
+var raw_data = [],
+    year = false;
+
+d3.csv("data/Olympic.csv", function(error, data) {
+
+
+
+  raw_data = data.filter(function(d){
+    return d.NOC === "USA" && d.Medal === "Gold";
+
+
+});
+
+
+    var years = [];
+    raw_data.forEach(function(d){
+        d.year = parseFloat(d.Edition);
+        if (years.indexOf(d.year) == -1) {
+          years.push(d.year);
+        }
+
+
+
+    });
+    years.sort();
+    year = years [0];
+
+    d3.select("#year_dropdown").selectAll("options")
+      .data(years).enter().append("option")
+      .attr("value", function(d){
+        return d;
+      })
+      .text(function(d){
+        return d;
+
+
+      });
+
+      d3.select("#year_dropdown").on("change", function(){
+        year = years[this.selectedIndex];
+        draw();
+      });
+
+      draw();
+
+
+});
+
+function draw(){
+  var year_data = raw_data.filter(function(d){
+    return d.year === year;
+
+
+
+  });
+
+
+  var scale = d3.scale.linear()
+    .domain([0,239])
+    .range([20,110]);
+
+  var circle = d3.select("svg").selectAll("circle")
+    .data([year_data.length]);
+
+    circle.enter().append("circle")
+      .attr("r",0)
+      .attr("cx", 250)
+      .attr("cy", 250)
+      .attr("fill", "#F7CE56")
+      .style("stroke", "#A5814C");
+
+
+    // stroke-width="10"
+
+    circle.transition().duration(500)
+      .attr("r", function(d){
+        return scale(d)})
+      .style("stroke-width", function(d){
+        return scale(d)/5;
+      });
+
+
+}
+
+
+
+
+</script>
