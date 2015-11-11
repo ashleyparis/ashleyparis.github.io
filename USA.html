@@ -25,6 +25,7 @@ width:100%;
 <svg width=500 height=500>
   <div id="controls">
     <select id="year_dropdown"></select>
+    <select id="NOC_dropdown"></select>
   </div>
 
 
@@ -34,17 +35,17 @@ width:100%;
 <script>
 
 var raw_data = [],
-    year = false;
+    year = false,
+    country = false;
+
 
 d3.csv("data/Olympic.csv", function(error, data) {
 
 
-
   raw_data = data.filter(function(d){
-    return d.NOC === "USA" && d.Medal === "Gold";
-
-
+    return d.NOC === "USA";
 });
+
 
 
     var years = [];
@@ -53,10 +54,8 @@ d3.csv("data/Olympic.csv", function(error, data) {
         if (years.indexOf(d.year) == -1) {
           years.push(d.year);
         }
+});
 
-
-
-    });
     years.sort();
     year = years [0];
 
@@ -79,40 +78,110 @@ d3.csv("data/Olympic.csv", function(error, data) {
       draw();
 
 
+      var country = [];
+      raw_data.forEach(function(d){
+          d.country = parseFloat(d.NOC);
+          if (country.indexOf(d.country) == -1) {
+            country.push(d.country);
+          }
+
+      });
+
+      country.sort();
+      country = country [0];
+
+      d3.select("#country_dropdown").selectAll("options")
+        .data(country).enter().append("option")
+        .attr("value", function(d){
+          return d;
+        })
+        .text(function(d){
+          return d;
+
+
+        });
+
+        d3.select("#country_dropdown").on("change", function(){
+          country = country[this.selectedIndex];
+          draw();
+        });
+
+        draw();
+
+
 });
 
 function draw(){
   var year_data = raw_data.filter(function(d){
     return d.year === year;
 
-
-
   });
 
+  var medal_data = d3.nest()
+   .key(function(d){
+     return d.Medal;
+   })
+   .rollup(function(leaves){
+     return leaves.length;
 
+   })
+   .entries(year_data);
+
+//use a variable for the domain filter for nest by years and the medals console.log  for eache year data. for each .values for each medal , max medals then set max medal to length
   var scale = d3.scale.linear()
-    .domain([0,239])
-    .range([20,110]);
+    // .domain([1, 2, 3, 4])
+    // .range([135.25,946.75]);
+    .domain([0,200])
+    .range([10,300]);
 
-  var circle = d3.select("svg").selectAll("circle")
-    .data([year_data.length]);
+console.log(window.innerHeight,window.innerWidth)
 
-    circle.enter().append("circle")
+  var circles = d3.select("svg").selectAll("circle")
+    .data(medal_data);
+
+    circles.enter().append("circle")
       .attr("r",0)
-      .attr("cx", 250)
+      .attr("cx", function(d,i){
+        return 250 + i*200;
+      })
       .attr("cy", 250)
-      .attr("fill", "#F7CE56")
-      .style("stroke", "#A5814C");
+      .attr("fill", function(d){
+        if (d.key=="Gold"){
+          return "#F7CE56";
+        }
+        else if (d.key=="Silver"){
+          return "#CCCFD1";
+        }
+        else {
+          return "#B07C4B";
+        }
+      })
+      .style("stroke", function(d){
+        if (d.key=="Gold"){
+          return "#A5814C";
+        }
+        else if (d.key=="Silver"){
+          return "#7F807D";
+        }
+        else {
+          return "#A55937";
+        }
+        })
 
 
     // stroke-width="10"
 
-    circle.transition().duration(500)
+    circles.transition().duration(500)
       .attr("r", function(d){
-        return scale(d)})
+        return scale(d.values)})
       .style("stroke-width", function(d){
-        return scale(d)/5;
+        return scale(d.values)/5;
       });
+
+
+
+
+
 
 
 }
