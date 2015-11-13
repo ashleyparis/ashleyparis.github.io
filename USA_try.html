@@ -17,6 +17,17 @@ width:100%;
     margin-left: 50%;
 
   }
+  #year_dropdown {
+  		position: absolute;
+  		top:30px;
+  		margin-left:30px;
+  	}
+
+  	#country_dropdown {
+  		position: absolute;
+  		top:55px;
+  		margin-left:30px;
+  	}
 
 
   </style>
@@ -35,20 +46,30 @@ width:100%;
 <script>
 
 var raw_data = [],
-    year = [],
-    country = [];
+    year = false,
+    country = false;
 
 
 d3.csv("data/Olympic.csv", function(error, data) {
 
-//dont want to filter by US want to filter by date first
 
-raw_data = data.filter(function(d){
-  return d.NOC === "USA";
-});
+//   raw_data = data.filter(function(d){
+//     return d.NOC === "USA";
+// });
+
+// years.sort();
+// year = years [0];
+
+var options = d3.select("#year_dropdown").selectAll("options")
+  .data(year).enter().append("option")
+  .text(function(d){
+    return d;
+  });
 
 
-    var years = [];
+  d3.select("#year_dropdown").on("change", function(){
+    year = years[this.selectedIndex];
+    // var years = [];
     raw_data.forEach(function(d){
         d.year = parseFloat(d.Edition);
         if (years.indexOf(d.year) == -1) {
@@ -56,22 +77,9 @@ raw_data = data.filter(function(d){
         }
 });
 
-    years.sort();
-    year = years [0];
-
-    d3.select("#year_dropdown").selectAll("options")
-      .data(years).enter().append("option")
-      .attr("value", function(d){
-        return d;
-      })
-      .text(function(d){
-        return d;
 
 
-      });
 
-      d3.select("#year_dropdown").on("change", function(){
-        year = years[this.selectedIndex];
         draw();
       });
 
@@ -127,13 +135,13 @@ function draw(){
    })
    .entries(year_data);
 
-
+//use a variable for the domain filter for nest by years and the medals console.log  for eache year data. for each .values for each medal , max medals then set max medal to length
   var scale = d3.scale.linear()
 
     .domain([0,200])
+
     .range([0, window.innerWidth/8]);
-//scale so there is an exception. Medals too small at 1896
-//keep the 0 because did not participate in the 1980 olympics
+
 
     var xScale = d3.scale.linear()
       .domain([0, 1, 2, 3])
@@ -190,7 +198,6 @@ console.log(window.innerHeight,window.innerWidth)
 
 
 }
-
 
 
 
