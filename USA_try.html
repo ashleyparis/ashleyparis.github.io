@@ -41,7 +41,7 @@ var raw_data = [],
 
 d3.csv("data/Olympic.csv", function(error, data) {
 
-//dont want to filter by US want to filter by date first
+//don't want to filter by US want to filter by date first
 
 raw_data = data.filter(function(d){
   return d.NOC === "USA";
@@ -87,28 +87,36 @@ raw_data = data.filter(function(d){
 
       });
 
+///dont know where to nest this so it doesn't repeat country names
+//also need to nest the whole name of country drop down in the year drop down so only shows the countries that competed that year
+      country.forEach(function(d){
+          if (country.indexOf(d.country) == -1) {
+            country.push(d.country);
+          }
+          });
+/////
+
       country.sort();
       country = country [0];
 
-      d3.select("#country_dropdown").selectAll("options")
-        .data(country).enter().append("option")
-        .attr("year", function(d){
-          return d.year;
-        })
-        .text(function(d){
-          return d.country;
 
 
-        });
-
-        d3.select("#country_dropdown").on("change", function(){
-          country = country[this.selectedIndex];
-          draw();
-        });
+      var countries = [];
+      			country = data.filter(function(d){
+      				return d.NOC;
+      			})
+      			var options = d3.select("#country_dropdown").selectAll("option")
+      				.data(country).enter().append("option")
+              .attr("value", function(d){
+                return d;
+              })
+      				.text(function(d){
+      					return d.NOC;
+      				});
 
         draw();
 
-
+//end of country selector
 });
 
 function draw(){
@@ -116,25 +124,6 @@ function draw(){
     return d.year === year;
 
   });
-
-
-
-  // var medal_data = d3.nest()
-  //  .key(function(d){
-  //    return d.Medal;
-  //  })
-  //  .rollup(function(leaves){
-  //    return {
-  //           "count": leaves.length,
-  //           "sum": d3.sum(leaves, function(d) {return parseFloat(d.medal);})
-  //       }
-  //   })
-  //   .entries(year_data);
-  //
-  //
-
-
-
 
   var medal_data = d3.nest()
    .key(function(d){
@@ -144,17 +133,12 @@ function draw(){
      return leaves.length;
 
    })
-   .rollup(function(leaves){
-     return {
-               "count": leaves.length,
-               "sum": d3.sum(leaves, function(d) {return parseFloat(d.year_data);})
-           }
-       })
    .entries(year_data);
 
 
-
   var scale = d3.scale.linear()
+//where to add and how to add the sum/total of the Medals
+//make it a number not a circle
 
     .domain([0,200])
     .range([0, window.innerWidth/8]);
@@ -166,7 +150,7 @@ function draw(){
       .range([window.innerWidth/8, window.innerWidth - window.innerWidth/8]);
 
 
-// console.log(window.innerHeight,window.innerWidth)
+console.log(window.innerHeight,window.innerWidth)
 
   var circles = d3.select("svg").selectAll("circle")
     .data(medal_data);

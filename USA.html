@@ -77,6 +77,7 @@ raw_data = data.filter(function(d){
 
       draw();
 
+//country selector
 
       var country = [];
       raw_data.forEach(function(d){
@@ -108,7 +109,7 @@ raw_data = data.filter(function(d){
 
         draw();
 
-
+//end of country selector
 });
 
 function draw(){
@@ -129,6 +130,8 @@ function draw(){
 
 
   var scale = d3.scale.linear()
+//where to add and how to add the sum/total of the Medals
+//make it a number not a circle
 
     .domain([0,200])
     .range([0, window.innerWidth/8]);
