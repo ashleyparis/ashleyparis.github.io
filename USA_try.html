@@ -2,24 +2,19 @@
 layout: default
 title: USA
 ---
+
 <style>
-
-svg {
-background-color: #F7F3E2;
-width:100%;
-
-
-}
-
-  #controls {
-    position:absolute;
-    top: 0;
-    margin-left: 50%;
-
+  svg {
+    background-color: #F7F3E2;
+    width: 100%;
   }
 
-
-  </style>
+  #controls {
+    position: absolute;
+    top: 0;
+    margin-left: 50%;
+  }
+</style>
 
 
 <svg width=500 height=500>
@@ -33,175 +28,261 @@ width:100%;
 
 
 <script>
-
-var raw_data = [],
+  var raw_data = [],
     year = [],
-    country = [];
+    country = [],
+    yearData,
+    currentYear,
+    currentCountry;
+  d3.csv("data/Olympic.csv", function(error, data) {
+    //don't want to filter by US want to filter by date first
 
+    var nestedData = d3.nest()
+      .key(function(d) {
+        return parseFloat(d.Edition);
+      })
+      .key(function(d) {
+        return d.NOC;
+      })
+      .entries(data);
+      // console.log(nestedData);
 
-d3.csv("data/Olympic.csv", function(error, data) {
-
-//don't want to filter by US want to filter by date first
-
-raw_data = data.filter(function(d){
-  return d.NOC === "USA";
-});
-
-
+    raw_data = data.filter(function(d) {
+      return d;
+    });
     var years = [];
-    raw_data.forEach(function(d){
-        d.year = parseFloat(d.Edition);
-        if (years.indexOf(d.year) == -1) {
-          years.push(d.year);
-        }
-});
-
-    years.sort();
-    year = years [0];
-
-    d3.select("#year_dropdown").selectAll("options")
-      .data(years).enter().append("option")
-      .attr("value", function(d){
+    raw_data.forEach(function(d) {
+      d.year = parseFloat(d.Edition);
+      if (year.indexOf(d.year) == -1) {
+        year.push(d.year);
+      }
+    });
+    year.sort();
+    currentYear = year[0];
+    years = nestedData.filter(function(d) {
+      return d;
+    })
+    d3.select("#year_dropdown").selectAll("option")
+      .data(nestedData).enter().append("option")
+      .attr("value", function(d) {
         return d;
       })
-      .text(function(d){
-        return d;
-
-
+      .text(function(d) {
+        return d.key;
       });
 
-      d3.select("#year_dropdown").on("change", function(){
-        year = years[this.selectedIndex];
-        draw();
-      });
+
+
+
+
+    // d3.select("#year_dropdown").selectAll("options")
+    //   .data(nestedData).enter().append("option")
+    //   .attr("value", function(d){
+    //     return d;
+    //   })
+    //   .text(function(d){
+    //     return d;
+    //   });
+    //   d3.select("#year_dropdown").on("change", function(){
+    //     years = nestedData[this.selectedIndex];
+    //     draw();
+    //   });
+    //   draw();
+
+
+
+
+    // raw_data.forEach(function(d){
+    //     d.country = parseFloat(d.NOC);
+    //     if (country.indexOf(d.country) == -1) {
+    //       country.push(d.country);
+    //     }
+    // });
+    ///dont know where to nest this so it doesn't repeat country names
+    //also need to nest the whole name of country drop down in the year drop down so only shows the countries that competed that year
+    // country.forEach(function(d){
+    //     if (country.indexOf(d.country) == -1) {
+    //       country.push(d.country);
+    //     }
+    //     });
+    ///
+
+    country.forEach(function(d) {
+      if (country.indexOf(d.country) == -1) {
+        country.push(d.country);
+      }
+    });
+
+    currentCountry = nestedData.filter(function(d){
+        var countryKey = parseFloat(d.key);
+        return countryKey === currentYear;
+    })
+
+
+    country.sort();
+
+    currentCountry = country[0];
+    // var countries = [];
+    country = data.filter(function(d) {
+      return d.NOC;
+    });
+
+
+    yearData = nestedData.filter(function(d){
+        var numKey = parseFloat(d.key);
+        return numKey === currentYear;
+    })
+
+
+    update_country()
+
+
+
+
+
+    d3.select("#year_dropdown").on("change", function(){
+      // console.log(years[this.selectedIndex].key);
+      currentYear = years[this.selectedIndex].key//ousite set default first value
+
+      update_country();
+
+
 
       draw();
+    });
 
-
-      var country = [];
-      raw_data.forEach(function(d){
-          d.country = parseFloat(d.NOC);
-          if (country.indexOf(d.country) == -1) {
-            country.push(d.country);
-          }
-
-      });
-
-///dont know where to nest this so it doesn't repeat country names
-//also need to nest the whole name of country drop down in the year drop down so only shows the countries that competed that year
-      country.forEach(function(d){
-          if (country.indexOf(d.country) == -1) {
-            country.push(d.country);
-          }
-          });
-/////
-
-      country.sort();
-      country = country [0];
+    d3.select("#country_dropdown").on("change", function(){
+      // console.log(years[this.selectedIndex].key);
+      currentCountry = d3.select(this).node()[this.selectedIndex].value;///outside
 
 
 
-      var countries = [];
-      			country = data.filter(function(d){
-      				return d.NOC;
-      			})
-      			var options = d3.select("#country_dropdown").selectAll("option")
-      				.data(country).enter().append("option")
-              .attr("value", function(d){
-                return d;
-              })
-      				.text(function(d){
-      					return d.NOC;
-      				});
+      draw();
+    });
 
-        draw();
+  draw();
 
-//end of country selector
-});
 
-function draw(){
-  var year_data = raw_data.filter(function(d){
-    return d.year === year;
 
+
+
+    // 
+    // var currentYear = 1896;
+    // var yearData = nestedData.filter(function(d) {
+    //   return d.key === currentYear;
+    // });
+
+    // var country = [];
+    // raw_data.forEach(function(d) {
+    //   d.country = parseFloat(d.NOC);
+    //   if (country.indexOf(d.country) == -1) {
+    //     country.push(d.country);
+    //   }
+    //
+    // });
+    //
+    // country.sort();
+    // country = country[0];
+    //
+    // var options = d3.select("#country_dropdown").selectAll("option")
+    //   .data(yearData).enter().append("option")
+    //   .attr("value", function(d) {
+    //     return d;
+    //   })
+    //   .text(function(d) {
+    //     return d;
+    //   });
+    // draw();
+    //end of country selector
   });
 
-  var medal_data = d3.nest()
-   .key(function(d){
-     return d.Medal;
-   })
-   .rollup(function(leaves){
-     return leaves.length;
-
-   })
-   .entries(year_data);
 
 
-  var scale = d3.scale.linear()
-//where to add and how to add the sum/total of the Medals
-//make it a number not a circle
 
-    .domain([0,200])
-    .range([0, window.innerWidth/8]);
-//scale so there is an exception. Medals too small at 1896
-//keep the 0 because did not participate in the 1980 olympics
 
+  function update_country(){
+    if (!currentCountry){
+      currentCountry = yearData[0].values[0].key;
+    }
+    var options = d3.select("#country_dropdown").selectAll("option")
+      .data(yearData[0].values, function(d){
+        return d.key;
+
+      })
+
+    options.enter().append("option")
+      .attr("value", function(d) {
+        return d.key;
+      })
+      .text(function(d) {
+        return d.key;
+      });
+      options.exit().remove()
+
+
+  }
+
+
+
+  function draw() {
+
+    var year_data = raw_data.filter(function(d) {
+      return d.year === currentYear && d.NOC === currentCountry; //country key
+    });
+    console.log(year_data);
+    var medal_data = d3.nest()
+      .key(function(d) {
+        return d.Medal;
+      })
+      .rollup(function(leaves) {
+        return leaves.length;
+      })
+      .entries(year_data);
+    var scale = d3.scale.pow().exponent(.5)
+      //where to add and how to add the sum/total of the Medals
+      //make it a number not a circle
+      .domain([0, 200])
+      .range([0, window.innerWidth / 8]);
+    //scale so there is an exception. Medals too small at 1896
+    //keep the 0 because did not participate in the 1980 olympics
     var xScale = d3.scale.linear()
       .domain([0, 1, 2, 3])
-      .range([window.innerWidth/8, window.innerWidth - window.innerWidth/8]);
-
-
-console.log(window.innerHeight,window.innerWidth)
-
-  var circles = d3.select("svg").selectAll("circle")
-    .data(medal_data);
-
+      .range([window.innerWidth / 8, window.innerWidth - window.innerWidth / 8]);
+    console.log(window.innerHeight, window.innerWidth)
+    var circles = d3.select("svg").selectAll("circle")
+      .data(medal_data);
     circles.enter().append("circle")
-      .attr("r",0)
-      .attr("cx", function(d,i){
-        return 250 + i*253;
+      .attr("r", 0)
+      .attr("cx", function(d, i) {
+        return 250 + i * 253;
       })
       .attr("cy", 250)
-      .attr("fill", function(d){
-        if (d.key=="Gold"){
+      .attr("fill", function(d) {
+        if (d.key == "Gold") {
           return "#F7CE56";
-        }
-        else if (d.key=="Silver"){
+        } else if (d.key == "Silver") {
           return "#CCCFD1";
-        }
-        else {
+        } else {
           return "#B07C4B";
         }
       })
-      .style("stroke", function(d){
-        if (d.key=="Gold"){
+      .style("stroke", function(d) {
+        if (d.key == "Gold") {
           return "#A5814C";
-        }
-        else if (d.key=="Silver"){
+        } else if (d.key == "Silver") {
           return "#7F807D";
-        }
-        else {
+        } else {
           return "#A55937";
         }
-        })
-
-
-
+      })
     circles.transition().duration(500)
-      .attr("r", function(d){
-        return scale(d.values)})
-      .style("stroke-width", function(d){
-        return scale(d.values)/5;
+      .attr("r", function(d) {
+        return scale(d.values)
+      })
+      .style("stroke-width", function(d) {
+        return scale(d.values) / 5;
       });
 
 
-
-
-
-
-
-}
-
-
-
-
+  }
 </script>

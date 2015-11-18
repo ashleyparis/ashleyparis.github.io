@@ -1,0 +1,151 @@
+---
+layout: default
+title: USA
+---
+
+<style>
+  svg {
+    background-color: #F7F3E2;
+    width: 100%;
+  }
+
+  #controls {
+    position: absolute;
+    top: 0;
+    margin-left: 50%;
+  }
+</style>
+
+
+<svg width=500 height=500>
+  <div id="controls">
+    <select id="year_dropdown"></select>
+    <select id="country_dropdown"></select>
+  </div>
+
+
+</svg>
+
+
+<script>
+  var raw_data = [],
+    year = [],
+    country = [];
+  d3.csv("data/Olympic.csv", function(error, data) {
+    //don't want to filter by US want to filter by date first
+    raw_data = data.filter(function(d) {
+      return d.NOC === "USA";
+    });
+    var years = [];
+    raw_data.forEach(function(d) {
+      d.year = parseFloat(d.Edition);
+      if (years.indexOf(d.year) == -1) {
+        years.push(d.year);
+      }
+    });
+    years.sort();
+    year = years[0];
+    d3.select("#year_dropdown").selectAll("options")
+      .data(years).enter().append("option")
+      .attr("value", function(d) {
+        return d;
+      })
+      .text(function(d) {
+        return d;
+      });
+    d3.select("#year_dropdown").on("change", function() {
+      year = years[this.selectedIndex];
+      draw();
+    });
+    draw();
+    var country = [];
+    raw_data.forEach(function(d) {
+      d.country = parseFloat(d.NOC);
+      if (country.indexOf(d.country) == -1) {
+        country.push(d.country);
+      }
+    });
+    ///dont know where to nest this so it doesn't repeat country names
+    //also need to nest the whole name of country drop down in the year drop down so only shows the countries that competed that year
+    country.forEach(function(d) {
+      if (country.indexOf(d.country) == -1) {
+        country.push(d.country);
+      }
+    });
+    /////
+    country.sort();
+    country = country[0];
+    var countries = [];
+    country = data.filter(function(d) {
+      return d.NOC;
+    })
+    var options = d3.select("#country_dropdown").selectAll("option")
+      .data(country).enter().append("option")
+      .attr("value", function(d) {
+        return d;
+      })
+      .text(function(d) {
+        return d.NOC;
+      });
+    draw();
+    //end of country selector
+  });
+
+  function draw() {
+    var year_data = raw_data.filter(function(d) {
+      return d.year === year;
+    });
+    var medal_data = d3.nest()
+      .key(function(d) {
+        return d.Medal;
+      })
+      .rollup(function(leaves) {
+        return leaves.length;
+      })
+      .entries(year_data);
+    var scale = d3.scale.linear()
+      //where to add and how to add the sum/total of the Medals
+      //make it a number not a circle
+      .domain([0, 200])
+      .range([0, window.innerWidth / 8]);
+    //scale so there is an exception. Medals too small at 1896
+    //keep the 0 because did not participate in the 1980 olympics
+    var xScale = d3.scale.linear()
+      .domain([0, 1, 2, 3])
+      .range([window.innerWidth / 8, window.innerWidth - window.innerWidth / 8]);
+    console.log(window.innerHeight, window.innerWidth)
+    var circles = d3.select("svg").selectAll("circle")
+      .data(medal_data);
+    circles.enter().append("circle")
+      .attr("r", 0)
+      .attr("cx", function(d, i) {
+        return 250 + i * 253;
+      })
+      .attr("cy", 250)
+      .attr("fill", function(d) {
+        if (d.key == "Gold") {
+          return "#F7CE56";
+        } else if (d.key == "Silver") {
+          return "#CCCFD1";
+        } else {
+          return "#B07C4B";
+        }
+      })
+      .style("stroke", function(d) {
+        if (d.key == "Gold") {
+          return "#A5814C";
+        } else if (d.key == "Silver") {
+          return "#7F807D";
+        } else {
+          return "#A55937";
+        }
+      })
+    circles.transition().duration(500)
+      .attr("r", function(d) {
+        return scale(d.values)
+      })
+      .style("stroke-width", function(d) {
+        return scale(d.values) / 5;
+      });
+  }
+</script>
