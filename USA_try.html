@@ -29,8 +29,6 @@ title: USA
 
 <script>
   var raw_data = [],
-    year = [],
-    country = [],
     yearData,
     currentYear,
     currentCountry;
@@ -45,27 +43,14 @@ title: USA
         return d.NOC;
       })
       .entries(data);
-      // console.log(nestedData);
 
-    raw_data = data.filter(function(d) {
-      return d;
-    });
-    var years = [];
-    raw_data.forEach(function(d) {
-      d.year = parseFloat(d.Edition);
-      if (year.indexOf(d.year) == -1) {
-        year.push(d.year);
-      }
-    });
-    year.sort();
-    currentYear = year[0];
-    years = nestedData.filter(function(d) {
-      return d;
-    })
+
+    raw_data = data;
+
     d3.select("#year_dropdown").selectAll("option")
       .data(nestedData).enter().append("option")
       .attr("value", function(d) {
-        return d;
+        d.key
       })
       .text(function(d) {
         return d.key;
@@ -73,64 +58,9 @@ title: USA
 
 
 
-
-
-    // d3.select("#year_dropdown").selectAll("options")
-    //   .data(nestedData).enter().append("option")
-    //   .attr("value", function(d){
-    //     return d;
-    //   })
-    //   .text(function(d){
-    //     return d;
-    //   });
-    //   d3.select("#year_dropdown").on("change", function(){
-    //     years = nestedData[this.selectedIndex];
-    //     draw();
-    //   });
-    //   draw();
-
-
-
-
-    // raw_data.forEach(function(d){
-    //     d.country = parseFloat(d.NOC);
-    //     if (country.indexOf(d.country) == -1) {
-    //       country.push(d.country);
-    //     }
-    // });
-    ///dont know where to nest this so it doesn't repeat country names
-    //also need to nest the whole name of country drop down in the year drop down so only shows the countries that competed that year
-    // country.forEach(function(d){
-    //     if (country.indexOf(d.country) == -1) {
-    //       country.push(d.country);
-    //     }
-    //     });
-    ///
-
-    country.forEach(function(d) {
-      if (country.indexOf(d.country) == -1) {
-        country.push(d.country);
-      }
-    });
-
-    currentCountry = nestedData.filter(function(d){
-        var countryKey = parseFloat(d.key);
-        return countryKey === currentYear;
-    })
-
-
-    country.sort();
-
-    currentCountry = country[0];
-    // var countries = [];
-    country = data.filter(function(d) {
-      return d.NOC;
-    });
-
-
-    yearData = nestedData.filter(function(d){
-        var numKey = parseFloat(d.key);
-        return numKey === currentYear;
+    yearData = nestedData.filter(function(d) {
+      var numKey = parseFloat(d.key);
+      return numKey === currentYear;
     })
 
 
@@ -140,9 +70,12 @@ title: USA
 
 
 
-    d3.select("#year_dropdown").on("change", function(){
+    d3.select("#year_dropdown").on("change", function() {
       // console.log(years[this.selectedIndex].key);
-      currentYear = years[this.selectedIndex].key//ousite set default first value
+      currentYear = nestedData[this.selectedIndex].key;
+
+
+      // currentYear = years[this.selectedIndex].key//ousite set default first value
 
       update_country();
 
@@ -151,61 +84,30 @@ title: USA
       draw();
     });
 
-    d3.select("#country_dropdown").on("change", function(){
+    d3.select("#country_dropdown").on("change", function() {
       // console.log(years[this.selectedIndex].key);
-      currentCountry = d3.select(this).node()[this.selectedIndex].value;///outside
+      currentCountry = d3.select(this).node()[this.selectedIndex].value; ///outside
 
 
 
       draw();
     });
 
-  draw();
+    draw();
 
 
-
-
-
-    // 
-    // var currentYear = 1896;
-    // var yearData = nestedData.filter(function(d) {
-    //   return d.key === currentYear;
-    // });
-
-    // var country = [];
-    // raw_data.forEach(function(d) {
-    //   d.country = parseFloat(d.NOC);
-    //   if (country.indexOf(d.country) == -1) {
-    //     country.push(d.country);
-    //   }
-    //
-    // });
-    //
-    // country.sort();
-    // country = country[0];
-    //
-    // var options = d3.select("#country_dropdown").selectAll("option")
-    //   .data(yearData).enter().append("option")
-    //   .attr("value", function(d) {
-    //     return d;
-    //   })
-    //   .text(function(d) {
-    //     return d;
-    //   });
-    // draw();
-    //end of country selector
   });
 
 
 
 
 
-  function update_country(){
-    if (!currentCountry){
+  function update_country() {
+    if (!currentCountry) {
       currentCountry = yearData[0].values[0].key;
     }
     var options = d3.select("#country_dropdown").selectAll("option")
-      .data(yearData[0].values, function(d){
+      .data(yearData[0].values, function(d) {
         return d.key;
 
       })
@@ -217,7 +119,7 @@ title: USA
       .text(function(d) {
         return d.key;
       });
-      options.exit().remove()
+    options.exit().remove()
 
 
   }
