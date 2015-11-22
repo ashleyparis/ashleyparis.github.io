@@ -35,7 +35,7 @@ title: USA
   d3.csv("data/Olympic.csv", function(error, data) {
     //don't want to filter by US want to filter by date first
 
-    var nestedData = d3.nest()
+    nestedData = d3.nest()
       .key(function(d) {
         return parseFloat(d.Edition);
       })
@@ -57,10 +57,12 @@ title: USA
       });
 
 
-
+currentYear = nestedData[0].key;
     yearData = nestedData.filter(function(d) {
-      var numKey = parseFloat(d.key);
-      return numKey === currentYear;
+      return d.key === currentYear;
+
+      // var numKey = parseFloat(d.key);
+      // return numKey === currentYear;
     })
 
 
