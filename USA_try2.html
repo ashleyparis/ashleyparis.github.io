@@ -29,72 +29,153 @@ title: USA
 
 <script>
   var raw_data = [],
-    year = [],
-    country = [];
-  d3.csv("data/Olympic.csv", function(error, data) {
-    //don't want to filter by US want to filter by date first
-    raw_data = data.filter(function(d) {
-      return d.NOC === "USA";
-    });
-    var years = [];
-    raw_data.forEach(function(d) {
-      d.year = parseFloat(d.Edition);
-      if (years.indexOf(d.year) == -1) {
-        years.push(d.year);
-      }
-    });
-    years.sort();
-    year = years[0];
-    d3.select("#year_dropdown").selectAll("options")
-      .data(years).enter().append("option")
-      .attr("value", function(d) {
-        return d;
-      })
-      .text(function(d) {
-        return d;
+    yearData,
+    currentYear,
+    currentCountry,
+    nestedData,
+    USA_data,
+    names;
+
+
+  d3.csv("data/names.csv", function(error, data) {
+
+
+
+
+
+
+
+
+    d3.csv("data/Olympic.csv", function(error, data) {
+      //don't want to filter by US want to filter by date first
+      USA_data = data.filter(function(d) {
+        return d.NOC === "USA";
       });
-    d3.select("#year_dropdown").on("change", function() {
-      year = years[this.selectedIndex];
+
+      USA_nestedData = d3.nest()
+        .key(function(d) {
+          return parseFloat(d.Edition);
+        })
+        .entries(USA_data);
+
+
+
+      data = data.filter(function(d) {
+        return d.NOC !== "USA";
+
+      })
+
+      nestedData = d3.nest()
+        .key(function(d) {
+          return parseFloat(d.Edition);
+        })
+        .key(function(d) {
+          return d.NOC;
+        })
+        .entries(data);
+
+
+      raw_data = data;
+
+      d3.select("#year_dropdown").selectAll("option")
+        .data(nestedData).enter().append("option")
+        .attr("value", function(d) {
+          d.key
+        })
+        .text(function(d) {
+          return d.key;
+        });
+
+
+      currentYear = nestedData[0].key;
+      yearData = nestedData.filter(function(d) {
+        return d.key === currentYear;
+
+        // var numKey = parseFloat(d.key);
+        // return numKey === currentYear;
+      })
+
+      update_year(),
+        update_country()
+
+
+
+
+
+      d3.select("#year_dropdown").on("change", function() {
+        // console.log(years[this.selectedIndex].key);
+        currentYear = nestedData[this.selectedIndex].key;
+
+
+        // currentYear = years[this.selectedIndex].key//ousite set default first value
+        update_year(),
+          update_country();
+
+
+
+        draw();
+      });
+
+      d3.select("#country_dropdown").on("change", function() {
+        // console.log(years[this.selectedIndex].key);
+        currentCountry = d3.select(this).node()[this.selectedIndex].value; ///outside
+
+
+
+        draw();
+      });
+
       draw();
+
+
     });
-    draw();
-    var country = [];
-    raw_data.forEach(function(d) {
-      d.country = parseFloat(d.NOC);
-      if (country.indexOf(d.country) == -1) {
-        country.push(d.country);
-      }
-    });
-    ///dont know where to nest this so it doesn't repeat country names
-    //also need to nest the whole name of country drop down in the year drop down so only shows the countries that competed that year
-    country.forEach(function(d) {
-      if (country.indexOf(d.country) == -1) {
-        country.push(d.country);
-      }
-    });
-    /////
-    country.sort();
-    country = country[0];
-    var countries = [];
-    country = data.filter(function(d) {
-      return d.NOC;
+
+
+  function update_year() {
+    yearData = nestedData.filter(function(d) {
+      return d.key === currentYear;
     })
+  }
+
+
+
+  function update_country() {
+    if (!currentCountry) {
+      currentCountry = yearData[0].values[0].key;
+    }
     var options = d3.select("#country_dropdown").selectAll("option")
-      .data(country).enter().append("option")
+      .data(yearData[0].values, function(d) {
+        return d.key;
+
+      })
+
+    options.enter().append("option")
       .attr("value", function(d) {
-        return d;
+        return d.key;
       })
       .text(function(d) {
-        return d.NOC;
+        return d.names;
       });
-    draw();
-    //end of country selector
-  });
+    options.exit().remove()
+
+    console.log(names)
+  }
+
+});
 
   function draw() {
+
     var year_data = raw_data.filter(function(d) {
-      return d.year === year;
+      return d.Edition === currentYear && d.NOC === currentCountry; //country key
     });
+
+
+    var newusa_data = USA_data.filter(function(d) {
+      return d.Edition === currentYear; //country key
+    });
+
+
+
     var medal_data = d3.nest()
       .key(function(d) {
         return d.Medal;
@@ -103,7 +184,30 @@ title: USA
         return leaves.length;
       })
       .entries(year_data);
-    var scale = d3.scale.linear()
+
+    medal_data.forEach(function(d) {
+      d.country = currentCountry;
+    });
+
+
+    var usa_medal_data = d3.nest()
+      .key(function(d) {
+        return d.Medal;
+      })
+      .rollup(function(leaves) {
+        return leaves.length;
+      })
+      .entries(newusa_data);
+
+    usa_medal_data.forEach(function(d) {
+      d.country = "USA";
+    });
+
+
+    medal_data = medal_data.concat(usa_medal_data);
+
+
+    var scale = d3.scale.pow().exponent(.5)
       //where to add and how to add the sum/total of the Medals
       //make it a number not a circle
       .domain([0, 200])
@@ -111,17 +215,26 @@ title: USA
     //scale so there is an exception. Medals too small at 1896
     //keep the 0 because did not participate in the 1980 olympics
     var xScale = d3.scale.linear()
-      .domain([0, 1, 2, 3])
-      .range([window.innerWidth / 8, window.innerWidth - window.innerWidth / 8]);
-    console.log(window.innerHeight, window.innerWidth)
+      .domain([0, 1, 2])
+      .range([window.innerWidth / 4, window.innerWidth - window.innerWidth / 4]);
+    // console.log(window.innerHeight, window.innerWidth)
     var circles = d3.select("svg").selectAll("circle")
-      .data(medal_data);
+      .data(medal_data, function(d, i) {
+        return d.key + "_" + d.country;
+      });
     circles.enter().append("circle")
       .attr("r", 0)
       .attr("cx", function(d, i) {
-        return 250 + i * 253;
+        return 250 + (i % 3) * 253;
       })
-      .attr("cy", 250)
+      .attr("cy", function(d) {
+        if (d.country == "USA") {
+          return 100;
+        } else {
+          return 300;
+        }
+      })
+      // .attr("cy", 250)
       .attr("fill", function(d) {
         if (d.key == "Gold") {
           return "#F7CE56";
@@ -142,10 +255,17 @@ title: USA
       })
     circles.transition().duration(500)
       .attr("r", function(d) {
+
         return scale(d.values)
       })
       .style("stroke-width", function(d) {
         return scale(d.values) / 5;
       });
+
+
+    circles.exit().transition().duration(500)
+      .attr("r", 0).remove();
+
+
   }
 </script>

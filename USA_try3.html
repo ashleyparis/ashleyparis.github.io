@@ -7,21 +7,122 @@ title: USA
   svg {
     background-color: #F7F3E2;
     width: 100%;
+    padding: 0;
+
+  }
+#top{
+  width: 100%;
+  padding: 0;
+  background-color: #F7F3E2;
+
+
+}
+  #year_dropdown {
+    list-style: none;
+           text-align: center;
+           color: #20526B;
+           font-size: 24px;
+           line-height: 35px;
+           height: 30px;
+           padding-left: 10px;
+           padding-bottom: 10px;
+           border-top: 1px solid #ccc;
+           position: absolute;
+           top: 20%;
+           margin-left: 46%;
+
   }
 
-  #controls {
+  #country_dropdown {
+    list-style: none;
+           text-align: center;
+           color: #20526B;
+           font-size: 15px;
+           line-height: 35px;
+           height: 25px;
+           width: 140px;
+           padding-left: 10px;
+           padding-bottom: 10px;
+           border-top: 1px solid #ccc;
+           position: absolute;
+           top: 600px;
+           margin-left: 3%;
+
+  }
+
+  #USA {
+    text-align: center;
+    color: #B0443A;
+    font-size: 28px;
+    height: 30px;
+    padding-left: 10px;
+    padding-bottom: 10px;
     position: absolute;
-    top: 0;
-    margin-left: 50%;
+    top: 25%;
+font-family: 'Open Sans', sans-serif;
+    margin-left: 3%;
+
+  }
+  body {
+      display: block;
+      margin: 0;
+  }
+  #dnc {
+    font-family: 'Open Sans', sans-serif;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    top: 30%;
+    transition: opacity 0s .2s;
+    width: 100%;
+  }
+  #dnc.visible {
+    opacity: 1;
+  }
+
+
+  .modalDialog {
+  	position: absolute;
+  	font-family: 'Helvetica Neue', Helvetica, sans-serif;
+/*
+  	width: 250px;
+  	height: 200px;*/
+    top: 45%;
+  	z-index: 99999;
+  	-webkit-transition: opacity 400ms ease-in;
+  	-moz-transition: opacity 400ms ease-in;
+  	transition: opacity 400ms ease-in;
+  	opacity: 0;
+  	pointer-events: none;
+  }
+  .modalDialog.open {
+  	opacity: 1;
   }
 </style>
+<img id="top" src="images/top-02.png" width="100%"/>
+<div id="openModal" class="modalDialog">
+	<div>
+
+		<h2></h2>
+		<h3></h3>
+	</div>
+</div>
+
+<div id ="USA">
+    <p> USA </p>
+
+</div>
 
 
-<svg width=500 height=500>
+<h1 id="dnc">Boycotted the Moscow Olympics. <br> Protested the Soviet invasion in Afghanistan.</h1>
+<svg width=500 height=700>
+
   <div id="controls">
     <select id="year_dropdown"></select>
     <select id="country_dropdown"></select>
   </div>
+
+
 
 
 </svg>
@@ -33,7 +134,31 @@ title: USA
     currentYear,
     currentCountry,
     nestedData,
-    USA_data;
+    USA_data,
+    names;
+
+
+  d3.csv("data/names.csv", function(error, data) {
+
+    names = data.reduce(function(obj, d){
+      obj[d.NOC] = d.Country.replace("*", "");
+      return obj;
+    }, {});
+
+
+    console.log(names)
+
+
+
+
+// currentCountry = yearData[0].values[0].key;
+// }
+// var options = d3.select("#country_dropdown").selectAll("option")
+// .data(yearData[0].values, function(d) {
+//   return d.key;
+
+
+
   d3.csv("data/Olympic.csv", function(error, data) {
     //don't want to filter by US want to filter by date first
     USA_data = data.filter(function(d) {
@@ -106,7 +231,9 @@ title: USA
 
     d3.select("#country_dropdown").on("change", function() {
       // console.log(years[this.selectedIndex].key);
-      currentCountry = d3.select(this).node()[this.selectedIndex].value; ///outside
+      currentCountry = d3.select(this).node()[this.selectedIndex].value;
+
+      data.sort(function(a, b) { return d3.ascending(a.Country, b.Country)});  ///outside
 
 
 
@@ -117,8 +244,10 @@ title: USA
 
 
   });
+  });
 
   function update_year() {
+    d3.select("#dnc").classed("visible", currentYear == "1980");
     yearData = nestedData.filter(function(d) {
       return d.key === currentYear;
     })
@@ -141,12 +270,15 @@ title: USA
         return d.key;
       })
       .text(function(d) {
-        return d.key;
+        return names[d.key] || d.key;
       });
     options.exit().remove()
 
 
+
+
   }
+
 
 
 
@@ -172,6 +304,24 @@ title: USA
       })
       .entries(year_data);
 
+    medal_data = medal_data.sort(function(a,b){
+      if (a.key == "Gold") {
+        a = 1;
+      } else if (a.key == "Silver") {
+        a = 2;
+      } else {
+        a = 3;
+      }
+      if (b.key == "Gold") {
+        b = 1;
+      } else if (b.key == "Silver") {
+        b = 2;
+      } else {
+        b = 3;
+      }
+      return a-b;
+    })
+
     medal_data.forEach(function(d) {
       d.country = currentCountry;
     });
@@ -186,11 +336,29 @@ title: USA
       })
       .entries(newusa_data);
 
+      usa_medal_data = usa_medal_data.sort(function(a,b){
+        if (a.key == "Gold") {
+          a = 1;
+        } else if (a.key == "Silver") {
+          a = 2;
+        } else {
+          a = 3;
+        }
+        if (b.key == "Gold") {
+          b = 1;
+        } else if (b.key == "Silver") {
+          b = 2;
+        } else {
+          b = 3;
+        }
+        return a-b;
+      })
+
     usa_medal_data.forEach(function(d) {
       d.country = "USA";
     });
 
-    console.log(usa_medal_data);
+    // console.log(usa_medal_data);
 
     medal_data = medal_data.concat(usa_medal_data);
 
@@ -199,7 +367,7 @@ title: USA
       //where to add and how to add the sum/total of the Medals
       //make it a number not a circle
       .domain([0, 200])
-      .range([0, window.innerWidth / 8]);
+      .range([0, window.innerWidth / 10]);
     //scale so there is an exception. Medals too small at 1896
     //keep the 0 because did not participate in the 1980 olympics
     var xScale = d3.scale.linear()
@@ -213,13 +381,14 @@ title: USA
     circles.enter().append("circle")
       .attr("r", 0)
       .attr("cx", function(d, i) {
-        return 250 + (i % 3) * 253;
+
+        return 330 + (i % 3) * window.innerWidth/4;
       })
       .attr("cy", function(d) {
         if (d.country == "USA") {
-          return 100;
+          return 250;
         } else {
-          return 300;
+          return 500;
         }
       })
       // .attr("cy", 250)
@@ -243,16 +412,31 @@ title: USA
       })
     circles.transition().duration(500)
       .attr("r", function(d) {
-        console.log(d.country, d.key, d.values)
+        // console.log(d.country, d.key, d.values)
         return scale(d.values)
       })
       .style("stroke-width", function(d) {
-        return scale(d.values) / 5;
+        return 5;
       });
 
 
     circles.exit().transition().duration(500)
       .attr("r", 0).remove();
+
+
+
+      circles.on("mouseover", function(d){
+      			d3.select(this)
+      			d3.select("#openModal").select("h2").text(d.values);
+      			d3.select("#openModal")
+            .style("top", d.y + "px")
+				    .style("left", d.x + "px")
+
+      				.classed("open", true);
+      		});
+
+
+    console.log(medal_data)
 
 
   }
