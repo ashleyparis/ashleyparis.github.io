@@ -256,6 +256,9 @@ font-family: 'Open Sans', sans-serif;
 
 
   function update_country() {
+    yearData[0].values = yearData[0].values.sort(function(a, b){
+    return d3.ascending(names[a.key] || a.key, names[b.key] || b.key);
+});
     if (!currentCountry) {
       currentCountry = yearData[0].values[0].key;
     }
@@ -381,7 +384,7 @@ font-family: 'Open Sans', sans-serif;
     circles.enter().append("circle")
       .attr("r", 0)
       .attr("cx", function(d, i) {
-
+        var i = d.key === "Gold" ? 0 : d.key === "Silver" ? 1 : 2;
         return 330 + (i % 3) * window.innerWidth/4;
       })
       .attr("cy", function(d) {
@@ -429,8 +432,18 @@ font-family: 'Open Sans', sans-serif;
       			d3.select(this)
       			d3.select("#openModal").select("h2").text(d.values);
       			d3.select("#openModal")
-            .style("top", d.y + "px")
-				    .style("left", d.x + "px")
+            .style("top", function(d, i) {
+              var i = d.key === "Gold" ? 0 : d.key === "Silver" ? 1 : 2;
+              return 330 + (i % 3) * window.innerWidth/4;
+            })
+
+				    .style("left", function(d) {
+              if (d.country == "USA") {
+                return 250;
+              } else {
+                return 500;
+              }
+            })
 
       				.classed("open", true);
       		});
