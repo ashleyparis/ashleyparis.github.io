@@ -90,9 +90,10 @@ font-family: 'Open Sans', sans-serif;
     /*top: 15%;*/
 
   	z-index: 99999;
-  	-webkit-transition: opacity 400ms ease-in;
-  	-moz-transition: opacity 400ms ease-in;
-  	transition: opacity 400ms ease-in;
+  	-webkit-transition: opacity 100ms ease-in;
+  	-moz-transition: opacity 100ms ease-in;
+  	transition: opacity 100ms ease-in;
+    transition: opacity 400ms ease-out;
   	opacity: 0;
   	pointer-events: none;
   }
@@ -434,21 +435,29 @@ font-family: 'Open Sans', sans-serif;
       			d3.select("#openModal").select("h2").text(d.values);
       			d3.select("#openModal")
 
+
+
             .style("left", function(x, i) {
               var i = d.key === "Gold" ? 0 : d.key === "Silver" ? 1 : 2;
-              return 330 + (i % 3) * window.innerWidth/4;
+              return (310 + (i % 3) * window.innerWidth/4) + "px";
             })
 
 				    .style("top", function() {
               if (d.country == "USA") {
-                return 250;
+                return 500 + "px";
               } else {
-                return 500;
+                return 700 + "px";
               }
             })
 
       				.classed("open", true);
       		});
+
+
+          circles.on("mouseout", function(d){
+			d3.select(this)
+			d3.select("#openModal").classed("open", false);
+		});
 
 
     console.log(medal_data)
