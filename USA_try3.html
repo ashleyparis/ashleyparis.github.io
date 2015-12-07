@@ -87,7 +87,8 @@ font-family: 'Open Sans', sans-serif;
 /*
   	width: 250px;
   	height: 200px;*/
-    top: 45%;
+    /*top: 15%;*/
+
   	z-index: 99999;
   	-webkit-transition: opacity 400ms ease-in;
   	-moz-transition: opacity 400ms ease-in;
@@ -432,12 +433,13 @@ font-family: 'Open Sans', sans-serif;
       			d3.select(this)
       			d3.select("#openModal").select("h2").text(d.values);
       			d3.select("#openModal")
-            .style("top", function(d, i) {
+
+            .style("left", function(x, i) {
               var i = d.key === "Gold" ? 0 : d.key === "Silver" ? 1 : 2;
               return 330 + (i % 3) * window.innerWidth/4;
             })
 
-				    .style("left", function(d) {
+				    .style("top", function() {
               if (d.country == "USA") {
                 return 250;
               } else {
