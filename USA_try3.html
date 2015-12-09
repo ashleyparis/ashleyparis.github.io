@@ -7,13 +7,15 @@ title: USA
   svg {
     background-color: #F7F3E2;
     width: 100%;
-    padding: 0;
+
 
   }
 #top{
+  position: absolute;
   width: 100%;
   padding: 0;
   background-color: #F7F3E2;
+  top:0%;
 
 
 }
@@ -23,13 +25,14 @@ title: USA
            color: #20526B;
            font-size: 24px;
            line-height: 35px;
-           height: 30px;
+           height: 37px;
            padding-left: 10px;
            padding-bottom: 10px;
            border-top: 1px solid #ccc;
            position: absolute;
            top: 20%;
-           margin-left: 46%;
+           margin-left: 47.5%;
+           font-family: 'Open Sans', sans-serif;
 
   }
 
@@ -45,22 +48,26 @@ title: USA
            padding-bottom: 10px;
            border-top: 1px solid #ccc;
            position: absolute;
-           top: 600px;
+           top: 670px;
            margin-left: 3%;
+           font-family: 'Open Sans', sans-serif;
+           font-weight: 800;
+           margin-left: 46.5%;
 
   }
 
   #USA {
-    text-align: center;
+
     color: #B0443A;
     font-size: 28px;
     height: 30px;
-    padding-left: 10px;
+
     padding-bottom: 10px;
     position: absolute;
     top: 25%;
-font-family: 'Open Sans', sans-serif;
-    margin-left: 3%;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    margin-left: 48.8%;
 
   }
   body {
@@ -69,10 +76,11 @@ font-family: 'Open Sans', sans-serif;
   }
   #dnc {
     font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
     opacity: 0;
     position: absolute;
     text-align: center;
-    top: 30%;
+    top: 35%;
     transition: opacity 0s .2s;
     width: 100%;
   }
@@ -101,7 +109,7 @@ font-family: 'Open Sans', sans-serif;
   	opacity: 1;
   }
 </style>
-<img id="top" src="images/top-02.png" width="100%"/>
+
 <div id="openModal" class="modalDialog">
 	<div>
 
@@ -116,9 +124,9 @@ font-family: 'Open Sans', sans-serif;
 </div>
 
 
-<h1 id="dnc">Boycotted the Moscow Olympics. <br> Protested the Soviet invasion in Afghanistan.</h1>
-<svg width=500 height=700>
-
+<h1 id="dnc">Boycotted the Moscow Olympics <br> to protest the Soviet invasion in Afghanistan.</h1>
+<svg width=500 height=900>
+<image id="top" xlink:href="images/top-02.png" height="5.5%" width="100%"/>
   <div id="controls">
     <select id="year_dropdown"></select>
     <select id="country_dropdown"></select>
@@ -372,12 +380,12 @@ font-family: 'Open Sans', sans-serif;
       //where to add and how to add the sum/total of the Medals
       //make it a number not a circle
       .domain([0, 200])
-      .range([0, window.innerWidth / 10]);
+      .range([0, window.innerWidth / 12]);
     //scale so there is an exception. Medals too small at 1896
     //keep the 0 because did not participate in the 1980 olympics
     var xScale = d3.scale.linear()
       .domain([0, 1, 2])
-      .range([window.innerWidth / 4, window.innerWidth - window.innerWidth / 4]);
+      .range([window.innerWidth / 5, window.innerWidth - window.innerWidth / 5]);
     // console.log(window.innerHeight, window.innerWidth)
     var circles = d3.select("svg").selectAll("circle")
       .data(medal_data, function(d, i) {
@@ -386,14 +394,14 @@ font-family: 'Open Sans', sans-serif;
     circles.enter().append("circle")
       .attr("r", 0)
       .attr("cx", function(d, i) {
-        var i = d.key === "Gold" ? 0 : d.key === "Silver" ? 1 : 2;
-        return 330 + (i % 3) * window.innerWidth/4;
+        var i = d.key === "Gold" ? 1 : d.key === "Silver" ? 2 : 3;
+        return (i % 4) * window.innerWidth/4;
       })
       .attr("cy", function(d) {
         if (d.country == "USA") {
           return 250;
         } else {
-          return 500;
+          return 590;
         }
       })
       // .attr("cy", 250)
@@ -439,14 +447,14 @@ font-family: 'Open Sans', sans-serif;
 
             .style("left", function(x, i) {
               var i = d.key === "Gold" ? 0 : d.key === "Silver" ? 1 : 2;
-              return (310 + (i % 3) * window.innerWidth/4) + "px";
+              return 280 + (i % 3) * window.innerWidth/3 + "px";
             })
 
 				    .style("top", function() {
               if (d.country == "USA") {
-                return 500 + "px";
+                return 250 + "px";
               } else {
-                return 700 + "px";
+                return 590 + "px";
               }
             })
 
