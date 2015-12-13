@@ -8,12 +8,17 @@ title: USA
     background-color: #F7F3E2;
     width: 100%;
 
-
   }
+
+
+  body {
+      background-color: #F7F3E2;
+  }
+
+
 #top{
   width: 100%;
   padding: 0;
-  background-color: #F7F3E2;
   top:0%;
 }
   #year_dropdown {
@@ -26,7 +31,7 @@ title: USA
            padding-left: 10px;
            padding-bottom: 10px;
            border-top: 1px solid #ccc;
-           position: absolute;
+
            top: 20%;
            margin-left: 47.5%;
            font-family: 'Open Sans', sans-serif;
@@ -130,17 +135,14 @@ title: USA
 
 <h1 id="dnc">Boycotted the Moscow Olympics <br> to protest the Soviet invasion in Afghanistan.</h1>
 
-<image id="top" src="images/top-02.png" width="100%"/>
-
-<div id="controls">
-  <select id="year_dropdown"></select>
-  <select id="country_dropdown"></select>
+<div id="top">
+    <img src="images/top-02.png" width="100%"/>
+    <select id="year_dropdown"></select>
 </div>
 
+<select id="country_dropdown"></select>
+
 <svg width=500 height=900></svg>
-
-
-
 
 
 <script>
@@ -376,12 +378,12 @@ function draw() {
 
   medal_data = medal_data.concat(usa_medal_data);
 
-
+  var height = window.innerHeight - parseInt(d3.select("img#top").style("height").replace("px", ""));
   var scale = d3.scale.pow().exponent(.5)
     //where to add and how to add the sum/total of the Medals
     //make it a number not a circle
     .domain([0, 200])
-    .range([0, window.innerWidth / 12]);
+    .range([0, height/5]);
   //scale so there is an exception. Medals too small at 1896
   //keep the 0 because did not participate in the 1980 olympics
   var xScale = d3.scale.linear()
@@ -404,11 +406,12 @@ function draw() {
     })
     .attr("cy", function(d) {
       if (d.country == "USA") {
-        return 270;
+        return height/3;
       } else {
-        return 640;
+        return height * (2/3);
       }
     })
+
     // .attr("cy", 250)
     .attr("fill", function(d) {
       if (d.key == "Gold") {
