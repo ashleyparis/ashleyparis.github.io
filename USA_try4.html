@@ -32,8 +32,8 @@ title: USA
            padding-bottom: 10px;
            border-top: 1px solid #ccc;
 
-           top: 20%;
-           margin-left: 47.5%;
+           top: 23%;
+           margin-left: 49%;
            font-family: 'Open Sans', sans-serif;
 
   }
@@ -50,7 +50,7 @@ title: USA
            padding-bottom: 10px;
            border-top: 1px solid #ccc;
            position: absolute;
-           top: 670px;
+           top: 50%;
            margin-left: 3%;
            font-family: 'Open Sans', sans-serif;
            font-weight: 800;
@@ -62,11 +62,11 @@ title: USA
 
     color: #B0443A;
     font-size: 28px;
-    height: 30px;
+    height: 33px;
 
     padding-bottom: 10px;
     position: absolute;
-    top: 21%;
+    top: 23%;
     font-family: 'Open Sans', sans-serif;
     font-weight: 800;
     margin-left: 48.8%;
@@ -378,7 +378,7 @@ function draw() {
 
   medal_data = medal_data.concat(usa_medal_data);
 
-  var height = window.innerHeight - parseInt(d3.select("img#top").style("height").replace("px", ""));
+  var height = window.innerHeight - parseInt(d3.select("#top").style("height").replace("px", ""));
   var scale = d3.scale.pow().exponent(.5)
     //where to add and how to add the sum/total of the Medals
     //make it a number not a circle
@@ -406,7 +406,7 @@ function draw() {
     })
     .attr("cy", function(d) {
       if (d.country == "USA") {
-        return height/3;
+        return height/5;
       } else {
         return height * (2/3);
       }
@@ -449,7 +449,7 @@ function draw() {
   circles.on("mouseover", function(d) {
     r = parseInt(d3.select(this).attr("r"))
     x = parseInt(d3.select(this).attr("cx"))
-    imgY = parseInt(d3.select("img#top").style("height").replace("px", ""))
+    imgY = parseInt(d3.select("#top").style("height").replace("px", ""))
     y = parseInt(d3.select(this).attr("cy")) + imgY + r + 15
     tooltip.text(d.values)
       .style("left", x + "px")
