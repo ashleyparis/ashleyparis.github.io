@@ -33,7 +33,7 @@ title: USA
            border-top: 1px solid #ccc;
 
            top: 23%;
-           margin-left: 49%;
+           margin-left: 48%;
            font-family: 'Open Sans', sans-serif;
 
   }
@@ -50,7 +50,7 @@ title: USA
            padding-bottom: 10px;
            border-top: 1px solid #ccc;
            position: absolute;
-           top: 50%;
+           top: 65%;
            margin-left: 3%;
            font-family: 'Open Sans', sans-serif;
            font-weight: 800;
@@ -406,7 +406,7 @@ function draw() {
     })
     .attr("cy", function(d) {
       if (d.country == "USA") {
-        return height/5;
+        return height/3.5;
       } else {
         return height * (2/3);
       }
