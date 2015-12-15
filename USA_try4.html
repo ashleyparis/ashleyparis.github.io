@@ -277,7 +277,13 @@ function update_country() {
   yearData[0].values = yearData[0].values.sort(function(a, b) {
     return d3.ascending(names[a.key] || a.key, names[b.key] || b.key);
   });
-  if (!currentCountry) {
+
+  var countryIds = yearData[0].values.map(function(d){
+      return d.key;
+    });
+
+
+  if (countryIds.indexOf(currentCountry) < 0) {
     currentCountry = yearData[0].values[0].key;
   }
   var options = d3.select("#country_dropdown").selectAll("option")
@@ -292,6 +298,8 @@ function update_country() {
     .text(function(d) {
       return names[d.key] || d.key;
     });
+
+    options.order();
   options.exit().remove()
 }
 
@@ -408,7 +416,7 @@ function draw() {
       if (d.country == "USA") {
         return height/3.5;
       } else {
-        return height * (2/3);
+        return height * (4/5);
       }
     })
 
